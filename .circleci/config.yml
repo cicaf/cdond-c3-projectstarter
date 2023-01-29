@@ -49,7 +49,6 @@ jobs:
             cd frontend
             npm install
             npm run build
-            exit2
       - slack/notify:
           event: fail
           template: basic_fail_1
