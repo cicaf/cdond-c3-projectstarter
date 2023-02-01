@@ -8,7 +8,7 @@ commands:
     parameters:
       workflow_id: 
         type: string
-        default: ${CIRCLECI_WORKFLOW_ID}
+        default: ${CIRCLECI_WORKFLOW_ID:0:7}
       # Add parameter
     steps:
       - run:
