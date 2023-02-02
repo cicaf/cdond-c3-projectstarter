@@ -33,5 +33,6 @@ Resources:
       # Ubuntu 18 or higher works fine
       ImageId: ami-095413544ce52437d
       Tags:
-        - Key: Name
+
+        - Key: udacity
           Value: !Sub backend-${ID}
