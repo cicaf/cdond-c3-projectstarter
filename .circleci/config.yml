@@ -179,6 +179,9 @@ jobs:
   configure-infrastructure:
     docker:
       - image: python3.7.16-alpine3.16
+        auth:
+          username: omarow
+          password: dckr_pat_dGS87cvLKkzxUYJwqQD4C2SpG58
 
     steps:
       - checkout 
