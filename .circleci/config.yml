@@ -333,8 +333,8 @@ workflows:
           #   branches:
           #     only: [test-feature-branch] #we can just edit it and just run on master 
 
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
