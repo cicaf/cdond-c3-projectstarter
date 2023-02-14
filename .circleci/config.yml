@@ -46,7 +46,7 @@ commands:
           when: on_fail
           command: |
             aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
-            aws s3 rm  s3://udapeople-omar<<parameters.workflow_id>> --recursive
+            aws s3 rm  s3://udapeople-<<parameters.workflow_id>> --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
 
   revert-migrations:
@@ -313,12 +313,12 @@ jobs:
             cd backend
             npm i
             npm run build
-            npm audit fix #This
+            npm audit fix --force #This
             cd ..
 
             cd .circleci/ansible
             mkdir files
-            tar -C  /backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
+            tar -C  ../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
             cd ../
 
             echo "Contents of inventory.txt file is -------"
