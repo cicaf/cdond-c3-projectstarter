@@ -318,7 +318,8 @@ jobs:
 
             cd .circleci/ansible
             mkdir files
-            tar -C  ../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
+            cd files
+            tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
             cd ../
 
             echo "Contents of inventory.txt file is -------"
