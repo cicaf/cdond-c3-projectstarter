@@ -313,11 +313,12 @@ jobs:
             cd backend
             npm i
             npm run build
+            npm audit fix #This
             cd ..
 
             cd .circleci/ansible
             mkdir files
-            tar -C  backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
+            tar -C  /backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
             cd ../
 
             echo "Contents of inventory.txt file is -------"
