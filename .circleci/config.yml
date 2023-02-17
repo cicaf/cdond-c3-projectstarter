@@ -313,8 +313,9 @@ jobs:
             cd backend
 
             npm i
+            npm audit fix --force #This Switcheroo
             npm run build
-            npm audit fix --force #This
+            
             cd ..
 
             cd .circleci/ansible
