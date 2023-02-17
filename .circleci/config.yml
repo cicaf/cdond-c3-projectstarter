@@ -19,7 +19,7 @@ commands:
       - run:
           name: Install Node.js 13
           command: |
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
             sudo apt install -y nodejs            
 
   install_ansible:
@@ -282,7 +282,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            sudo npm install -g npm@6.12.0  #REMOVING THE atlatest tag to see...
+            sudo npm install -g npm@latest  #REMOVING THE atlatest tag to see...
             rm -rf node_modules
             npm install
             npm run build
