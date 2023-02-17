@@ -241,7 +241,6 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit fix ##############################################################################3just to check on mig
             npm run migrations > migrations_dump.txt
       - run:
           name: Send migration results to kvdb
