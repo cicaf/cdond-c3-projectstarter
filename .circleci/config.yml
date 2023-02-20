@@ -107,7 +107,7 @@ jobs:
              cd backend
              npm install
              npm run build
-             npm audit fix --force ###########################################################################################3CHECK THIS
+            #  npm audit fix --force ###########################################################################################3CHECK THIS
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -329,8 +329,8 @@ jobs:
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
 
-      # - destroy-environment
-      # - revert-migrations
+      - destroy-environment
+      - revert-migrations
 
 #       # Here's where you will add some code to rollback on failure  
 
@@ -390,8 +390,8 @@ jobs:
           command: |
             aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" --stack-name InitialStack
             # your code here
-      - destroy-environment
-      - revert-migrations
+      # - destroy-environment
+      # - revert-migrations
       # Here's where you will add some code to rollback on failure  
 
 # cleanup:
