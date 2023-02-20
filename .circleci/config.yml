@@ -283,7 +283,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            sudo npm install -g npm@latest  #REMOVING THE atlatest tag to see...######################################################################################
+            sudo npm install -g npm@6.14.4  #REMOVING THE atlatest tag to see...######################################################################################
             rm -rf node_modules
             npm install
             npm run build
