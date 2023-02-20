@@ -19,7 +19,7 @@ commands:
       - run:
           name: Install Node.js 13
           command: |
-            curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
             sudo apt install -y nodejs            
 
   install_ansible:
@@ -367,8 +367,8 @@ jobs:
             else
               exit 1
             fi
-      # - destroy-environment
-      # - revert-migrations
+      - destroy-environment
+      - revert-migrations
 
             # your code here
       # Here's where you will add some code to rollback on failure  
@@ -390,8 +390,8 @@ jobs:
           command: |
             aws cloudformation deploy --template-file .circleci/files/cloudfront.yml --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" --stack-name InitialStack
             # your code here
-      # - destroy-environment
-      # - revert-migrations
+      - destroy-environment
+      - revert-migrations
       # Here's where you will add some code to rollback on failure  
 
 # cleanup:
@@ -429,9 +429,9 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          # filters:
-          #   branches:
-          #     only: [test-feature-branch] #we can just edit it and just run on master 
+          filters:
+            branches:
+              only: [test-feature-branch] #we can just edit it and just run on master 
 
       - configure-infrastructure:
           requires: [deploy-infrastructure]
