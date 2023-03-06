@@ -333,7 +333,7 @@ jobs:
       - revert-migrations
 
 #       # Here's where you will add some code to rollback on failure  
-########################################################################SMOKE TEST 2
+########################################################################SMOKE TEST 2#####################I REALLY HOPE THIS THING ISNT PLAYING WITH MY HEART
   smoke-test:
     docker:
       - image: python:3.7-alpine3.16
