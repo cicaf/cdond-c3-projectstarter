@@ -19,8 +19,14 @@ commands:
       - run:
           name: Install Node.js 13
           command: |
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-            sudo apt install -y nodejs            
+             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+             sudo apt-get install -y nodejs
+             
+             sudo npm install -g n
+             sudo n 13.8.0
+            # curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            # sudo apt install -y nodejs   ####REMEMBER THESE TWO COMMENTED LINES ABOVE
+                       
 
   install_ansible:
     description: Install Ansible
@@ -166,9 +172,9 @@ jobs:
           command: |
               cd backend
               npm install
-              # npm audit fix --audit-level=critical --force############################################################3CHECK THIS
-              # npm audit fix --audit-level=critical --force
-              # npm audit --audit-level=critical
+              npm audit fix --audit-level=critical --force#############################################################################################################################33CHECK THIS
+              npm audit fix --audit-level=critical --force
+              npm audit --audit-level=critical
 
   deploy-infrastructure:
     docker:
