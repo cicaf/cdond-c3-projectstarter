@@ -900,7 +900,7 @@ jobs:
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
-            mkdir -p /root/project/.circleci/ansible/roles/deploy/files/
+            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
             cd .circleci/ansible/
             echo "content of inventory file"
