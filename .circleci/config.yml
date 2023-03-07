@@ -894,7 +894,6 @@ jobs:
           ###IZI HAPA NI BTW MSEEE CHUJA INCASE#################################### PIA HIO LINE YA FROM CD.. HAPO 906
       
       - install_awscli
-      - install_ansible
 
       - run:
           name: Deploy backend
