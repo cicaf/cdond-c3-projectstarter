@@ -307,36 +307,73 @@ jobs:
       # Add ssh keys with fingerprint
       # attach workspace
       - checkout
+      - install_nodejs
+      - install_awscli
+      - install_ansible
+
       - add_ssh_keys:
           fingerprints:
             - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
       - attach_workspace:
           at: ~/
-      - install_nodejs
-      - install_awscli
-      - install_ansible
+      - restore_cache:
+          keys: [backend-deps]
+      
       - run:
-          name: Deploy Backend
+          name: Install dependencies
+          command: |
+            # your code here
+            cd backend
+            npm install
+      - run:
+          name: Package Backend
           command: |
             cd backend
-
-            npm i
             npm run build
-            #npm audit fix --force #This Switcheroo            
+            tar -czf artifact.tar.gz dist/* package*
             cd ..
-
+            mkdir .circleci/ansible/roles/deploy/files
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+          command: |
+            # your code here
+            export TYPEORM_MIGRATIONS_DIR=./migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
-            mkdir files
-            cd files
-            tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
-            cd ../
-
-            echo "Contents of inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-      - destroy-environment
-      - revert-migrations
+
+      
+          ##########EDITING####################################################################THSIS THE LOST PART
+      # - run:
+      #     name: Deploy Backend
+      #     command: |
+      #       cd backend
+
+      #       npm i
+      #       npm run build
+      #       #npm audit fix --force #This Switcheroo            
+      #       cd ..
+
+      #       cd .circleci/ansible
+      #       mkdir files
+      #       cd files
+      #       tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
+      #       cd ../
+
+      #       echo "Contents of inventory.txt file is -------"
+      #       cat inventory.txt
+      #       ansible-playbook -i inventory.txt deploy-backend.yml
+
+      # - destroy-environment
+      # - revert-migrations
 
 #       # Here's where you will add some code to rollback on failure  
 ########################################################################SMOKE TEST 2#####################I REALLY HOPE THIS THING ISNT PLAYING WITH MY HEART
