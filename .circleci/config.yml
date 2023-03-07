@@ -891,6 +891,11 @@ jobs:
             - build-backend
       - attach_workspace: 
           at: ~/
+          ###IZI HAPA NI BTW MSEEE CHUJA INCASE#################################### PIA HIO LINE YA FROM CD.. HAPO 906
+      - install_nodejs
+      - install_awscli
+      - install_ansible
+
       - run:
           name: Deploy backend
           command: |
@@ -899,6 +904,7 @@ jobs:
             npm install
             npm run build
             cd ..
+            
             tar -C backend -czvf artifact.tar.gz .
             mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
