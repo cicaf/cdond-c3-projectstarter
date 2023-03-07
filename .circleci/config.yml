@@ -899,7 +899,9 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
+            
             npm install -g typescript
+            npm install
             npm run build
             cd ..
             
