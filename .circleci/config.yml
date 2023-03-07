@@ -330,7 +330,7 @@ jobs:
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
-      # - checkout
+      - checkout
       # - install_nodejs
       # - install_awscli
       # - install_ansible
@@ -340,7 +340,7 @@ jobs:
             - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
       - attach_workspace:
           at: ~/
-      - checkout
+      # - checkout
       - install_nodejs
       - install_awscli
       - install_ansible
