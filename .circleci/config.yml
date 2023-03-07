@@ -892,7 +892,7 @@ jobs:
       - attach_workspace: 
           at: ~/
           ###IZI HAPA NI BTW MSEEE CHUJA INCASE#################################### PIA HIO LINE YA FROM CD.. HAPO 906
-      - install_nodejs
+      
       - install_awscli
       - install_ansible
 
