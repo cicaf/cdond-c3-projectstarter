@@ -880,7 +880,8 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"]
+          fingerprints: 
+            - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
       
       - run:
           name: Install dependencies
@@ -899,7 +900,6 @@ jobs:
           command: |
             cd backend
             npm install -g typescript
-            npm install
             npm run build
             cd ..
             
