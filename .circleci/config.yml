@@ -312,11 +312,13 @@ jobs:
             - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
       - attach_workspace:
           at: ~/
-         
+      - install_nodejs
+      - install_awscli
+      - install_ansible
       - run:
           name: Deploy Backend
           command: |
-            cd backend
+            cd backend*
 
             npm i
             npm run build
