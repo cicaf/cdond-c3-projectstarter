@@ -350,7 +350,7 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            cd backend-app
+            cd backend
             npm install
       - run:
           name: Package Backend
