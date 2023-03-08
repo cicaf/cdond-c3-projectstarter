@@ -16,15 +16,20 @@
 - name: "Executing Node app with PM2"
   shell: |
     cd ~/backend-app/dist
+    pm2 stop default
+    pm2 start main.js
 
-    cd ../
-    npm install
 
-    npm run build
+    #########THESE NEXT COMMENTED LINES ARE THE TRUE CODE BASE########REMOVE  LINE 19 AND 20
 
-    sudo npm install forever -g
-    sudo npm install ts-node -g
-    forever start -c "ts-node -r tsconfig-paths/register -r dotenv/config src/main.ts" ./
+    # cd ../
+    # npm install
+
+    # npm run build
+
+    # sudo npm install forever -g
+    # sudo npm install ts-node -g
+    # forever start -c "ts-node -r tsconfig-paths/register -r dotenv/config src/main.ts" ./
 
   register: execute_node
 
@@ -32,10 +37,15 @@
   debug:
     msg: "{{ execute_node.stdout_lines }}"
 
+    ####THESE LINES NI MPYA....COMMENTED ONES LINE 40-43 WERE ORIGINAL
 - name: "Configure pm2 to start as service"
-  become: true
   shell: |
-    env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+    sudo su -c "env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu"
+    pm2 save
+# - name: "Configure pm2 to start as service"
+#   become: true
+#   shell: |
+#     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
 
 
 
