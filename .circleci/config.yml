@@ -325,35 +325,32 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/python:3.10
     steps:
       # Checkout code from git
       # Add ssh keys with fingerprint
       # attach workspace
       - checkout
-      # - install_nodejs
-      # - install_awscli
-      # - install_ansible
-
+      - install_ansible
+      - install_awscli
+      - install_nodejs
+      
+      - restore_cache:
+          keys: [backend-deps]
       - add_ssh_keys:
           fingerprints:
             - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
       - attach_workspace:
           at: ~/
-      # - checkout
-      - install_nodejs
-      - install_awscli
-      - install_ansible
-
-      
-      - restore_cache:
-          keys: [backend-deps]
+           
+      # - restore_cache:
+      #     keys: [backend-deps]
       
       - run:
           name: Install dependencies
           command: |
             # your code here
-            cd backend
+            cd backend-app
             npm install
       - run:
           name: Package Backend
@@ -362,7 +359,7 @@ jobs:
             npm run build
             tar -czf artifact.tar.gz dist/* package*
             cd ..
-            mkdir .circleci/ansible/roles/deploy/files
+            # mkdir .circleci/ansible/roles/deploy/files
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
           name: Deploy backend
