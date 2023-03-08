@@ -221,20 +221,44 @@ jobs:
       - checkout 
       - add_ssh_keys:
           fingerprints:
-            - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"     
+            - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
+
+      - install_awscli #MIGHT REMOVE LATER TEHEHEHE
+      - install_ansible
       - attach_workspace:
           at: ~/
 
-      - install_ansible
-      - install_awscli #MIGHT REMOVE LATER TEHEHEHE
+#######NEW ADDDITTION BETTANY-AID###### 232-245....UNCOMMENTING OF 256.....ADDITION OF 255 T0 258
+      - run:
+          name: Add .env vars to backend distro
+          command: |
+            echo ENVIRONMENT=production > backend/.env
+            echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
+            echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> backend/.env
+            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
+            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
+            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
+            echo NODE_ENV=production >> "backend/.env"  
+
+      
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment
-          #workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/backend
+            
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       # Here's where you will add some code to rollback on failure      
 
   run-migrations:
@@ -263,80 +287,163 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: cimg/base:stable
+      - image: python:3.7-alpine3.16
+      # Docker image here that supports NodeJS
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
-      - attach_workspace:
-          at: ~/
-
-      - install_nodejs
-      - install_awscli
-      - install_ansible
-
       - run:
-          name: Get Backend url
+          name: Install dependencies
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
-
+            apk add --update --no-cache tar gzip nodejs npm aws-cli 
+      - restore_cache:
+          keys: [frontend-build]
+      - run:
+          name: Get backend url
+          command: | 
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo "API_URL=http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
+            echo $(cat frontend/.env)
+      
       - run:
           name: Deploy frontend objects
           command: |
             cd frontend
-            sudo npm install -g npm@6.14.4  #REMOVING THE atlatest tag to see...######################################################################################
-            rm -rf node_modules
             npm install
             npm run build
-            #npm audit fix --force #THIS DOESNT BELONG HERE ITS SAFE TO REMOVE AFTER COMPLETION#########################################################################################3
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment
-      - revert-migrations
-      # Here's where you will add some code to rollback on failure      
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+  # deploy-frontend:
+  #   docker:
+  #     - image: cimg/base:stable
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
+  #     - attach_workspace:
+  #         at: ~/
+
+  #     - install_nodejs
+  #     - install_awscli
+  #     - install_ansible
+
+  #     - run:
+  #         name: Get Backend url
+  #         command: |
+  #           export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} --output text)
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "API_URL = ${API_URL}"
+  #           echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+  #           cat frontend/.env
+
+  #     - run:
+  #         name: Deploy frontend objects
+  #         command: |
+  #           cd frontend
+  #           sudo npm install -g npm@6.14.4  #REMOVING THE atlatest tag to see...######################################################################################
+  #           rm -rf node_modules
+  #           npm install
+  #           npm run build
+  #           #npm audit fix --force #THIS DOESNT BELONG HERE ITS SAFE TO REMOVE AFTER COMPLETION#########################################################################################3
+  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+  #     - destroy-environment
+  #     - revert-migrations
+  #     # Here's where you will add some code to rollback on failure      
                     
-  deploy-backend:
+   deploy-backend:
     docker:
+      # Docker image here that supports Ansible
       - image: cimg/base:stable
     steps:
       # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
       - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
-      - attach_workspace:
-          at: ~/
-      - install_nodejs
       - install_awscli
       - install_ansible
+      - install_nodejs
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+         fingerprints: ['90:c7:a9:21:a3:64:2c:f3:6b:cc:40:dc:dc:e9:54:91']
+      # attach workspace
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-deps]
       - run:
-          name: Deploy Backend
+          name: Install dependencies
           command: |
-            cd backend*
-
-            npm i
+            # your code here
+            cd backend
+            npm install
+      - run:
+          name: Package Backend
+          command: |
+            cd backend
             npm run build
-            #npm audit fix --force #This Switcheroo            
+            tar -czf artifact.tar.gz dist/* package*
             cd ..
-
+            mkdir .circleci/ansible/roles/deploy/files
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+          command: |
+            # your code here
+            export TYPEORM_MIGRATIONS_DIR=./migrations
+            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+            export TYPEORM_MIGRATIONS=./migrations/*.ts
             cd .circleci/ansible
-            mkdir files
-            cd files
-            tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
-            cd ../
-
-            echo "Contents of inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-      - destroy-environment
-      - revert-migrations
+  # deploy-backend:
+  #   docker:
+  #     - image: cimg/base:stable
+  #   steps:
+  #     # Checkout code from git
+  #     # Add ssh keys with fingerprint
+  #     # attach workspace
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints:
+  #           - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
+  #     - attach_workspace:
+  #         at: ~/
+  #     - install_nodejs
+  #     - install_awscli
+  #     - install_ansible
+  #     - run:
+  #         name: Deploy Backend
+  #         command: |
+  #           cd backend*
+
+  #           npm i
+  #           npm run build
+  #           #npm audit fix --force #This Switcheroo            
+  #           cd ..
+
+  #           cd .circleci/ansible
+  #           mkdir files
+  #           cd files
+  #           tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
+  #           cd ../
+
+  #           echo "Contents of inventory.txt file is -------"
+  #           cat inventory.txt
+  #           ansible-playbook -i inventory.txt deploy-backend.yml
+
+  #     - destroy-environment
+  #     - revert-migrations
 
 #       # Here's where you will add some code to rollback on failure  
 ########################################################################SMOKE TEST 2#####################I REALLY HOPE THIS THING ISNT PLAYING WITH MY HEART
