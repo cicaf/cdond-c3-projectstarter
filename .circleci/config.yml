@@ -227,36 +227,12 @@ jobs:
 
       - install_ansible
       - install_awscli #MIGHT REMOVE LATER TEHEHEHE
-      ######THESE NEXT TYPEORM TOOO ARE NEW AND CCAN BE REMOVED....
-      - run:
-          name: Add .env vars to backend distro
-          command: |
-            echo ENVIRONMENT=production > backend/.env
-            echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
-            echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> backend/.env
-            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
-            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
-            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> "backend/.env"
-            echo NODE_ENV=production >> "backend/.env"  
       - run:
           name: Configure server
           command: |
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-
-    #######THESE NEXT LINES EXCEPT DESTROY ENVIRON NI FOREIGN######3
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend
-
-      ###ABOVE UNAEZACHUJA IKIRINGA....
-
       - destroy-environment
           #workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       # Here's where you will add some code to rollback on failure      
@@ -331,77 +307,34 @@ jobs:
       # Add ssh keys with fingerprint
       # attach workspace
       - checkout
-      # - install_nodejs
-      # - install_awscli
-      # - install_ansible
-
       - add_ssh_keys:
           fingerprints:
             - "18:5b:b9:65:0a:09:d0:13:52:d3:9d:6e:98:9e:b9:37"
       - attach_workspace:
           at: ~/
-      
-
-      
-      - restore_cache:
-          keys: [backend-deps]
-      
+         
       - run:
-          name: Install dependencies
-          command: |
-            # your code here
-            cd backend-app
-            npm install
-      - run:
-          name: Package Backend
+          name: Deploy Backend
           command: |
             cd backend
-            npm install
+
+            npm i
             npm run build
-            tar -czf artifact.tar.gz dist/* package*
+            #npm audit fix --force #This Switcheroo            
             cd ..
-            mkdir .circleci/ansible/roles/deploy/files
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-      - run:
-          name: Deploy backend
-          command: |
-            # your code here
-            export TYPEORM_MIGRATIONS_DIR=./migrations
-            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-            export TYPEORM_MIGRATIONS=./migrations/*.ts
+
             cd .circleci/ansible
+            mkdir files
+            cd files
+            tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
+            cd ../
+
+            echo "Contents of inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-
-      
-          ##########EDITING####################################################################THSIS THE LOST PART
-      # - run:
-      #     name: Deploy Backend
-      #     command: |
-      #       cd backend
-
-      #       npm i
-      #       npm run build
-      #       #npm audit fix --force #This Switcheroo            
-      #       cd ..
-
-      #       cd .circleci/ansible
-      #       mkdir files
-      #       cd files
-      #       tar -C  ../../../backend -czvf artifact.tar.gz . #We are supposed to remember to add ../../ right before the backend
-      #       cd ../
-
-      #       echo "Contents of inventory.txt file is -------"
-      #       cat inventory.txt
-      #       ansible-playbook -i inventory.txt deploy-backend.yml
-
-      # - destroy-environment
-      # - revert-migrations
+      - destroy-environment
+      - revert-migrations
 
 #       # Here's where you will add some code to rollback on failure  
 ########################################################################SMOKE TEST 2#####################I REALLY HOPE THIS THING ISNT PLAYING WITH MY HEART
