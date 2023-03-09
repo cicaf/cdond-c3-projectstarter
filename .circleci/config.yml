@@ -444,7 +444,7 @@ jobs:
   #     - revert-migrations
 
             # your code here
-      # Here's where you will add some code to rollback on failure  
+      # Here's where we roll on fail
 
   cloudfront-update:
     docker:
