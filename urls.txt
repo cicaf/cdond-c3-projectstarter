@@ -2,4 +2,6 @@
 https://github.com/cicaf/cdond-c3-projectstarter
 
 2:PUBLIC URL TO S3 BUCKET:
+http://udapeople-78cfef0.s3-website-us-west-2.amazonaws.com
+
 
