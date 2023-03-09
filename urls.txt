@@ -1,0 +1,5 @@
+1:PUBLIC GITHUB URL:
+https://github.com/cicaf/cdond-c3-projectstarter
+
+2:PUBLIC URL TO S3 BUCKET:
+
