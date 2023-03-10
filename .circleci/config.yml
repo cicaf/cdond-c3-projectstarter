@@ -113,7 +113,7 @@ jobs:
              cd backend
              npm install
              npm run build
-            #  npm audit fix --force ###########################################################################################3CHECK THIS
+            #  npm audit fix --force ###########################################################################################3CHECK TH
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
