@@ -939,7 +939,7 @@ jobs:
 
   cloudfront-update:
    docker:
-      # Docker image here that supports AWS CLI
+      # Docker image here that supports AWS CLI all
       - image: cimg/base:stable
    steps:
       - checkout
