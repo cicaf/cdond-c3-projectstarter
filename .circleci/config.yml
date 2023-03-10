@@ -245,7 +245,7 @@ jobs:
       - attach_workspace:
           at: ~/
 
-#######NEW ADDDITTION BETTANY-AID###### 232-245....UNCOMMENTING OF 256.....ADDITION OF 255 T0 258
+#######NEW ADDDITTION BETTANY-AID###### 232-245....UNCOMMENTING OF 256..ADDITION OF 255 T0 258
       - run:
           name: Add .env vars to backend distro
           command: |
