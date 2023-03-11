@@ -417,7 +417,7 @@ jobs:
             if curl -s ${URL} | grep "Welcome"
             then
               # Change this to 0 after the job fails
-              return 0
+              return 1
             else
               return 1
             fi
@@ -493,9 +493,9 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          # filters:
-          #   branches:
-          #     only: [test-feature-branch] #we can just edit it and just run on master 
+          filters:
+            branches:
+              only: [test-feature-branch] #we can just edit it and just run on master 
 
       - configure-infrastructure:
           requires: [deploy-infrastructure]
